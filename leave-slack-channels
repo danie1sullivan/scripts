@@ -1,0 +1,43 @@
+#!/usr/bin/env osascript
+(*
+	leave-slack-channels
+
+	Slack doesn't allow you /leave multiple channels. It also
+	doesn't accept multiple /leave commands in a single message.
+	Instead of creating a Slack App, use Applescript.
+
+	Requirements:
+	- terminal has accessibility permission
+
+	To grant permission (on 10.14.6):
+	System Preferences -> Security & Privacy -> Privacy -> Accessibility
+
+	What it does:
+	1. Bring Slack to the front or launches it, but we all know that
+	   it's already running.
+	2. Use System Events to send keystrokes, as Slack cannot.
+	3. Switch to writing yourself. Here @me gets expanded to your
+	   username and thus requires hitting enter ('key code 36')
+	   twice. The third enter is to send anything that may already be
+	   in the input field. 
+	4. Sends /leave [channel] for each channel in the channelList.
+*)
+
+set channelList to {"random", "lunch"}
+
+tell application "Slack" to activate
+delay 1
+
+tell application "System Events"
+	keystroke "/msg @me"
+	repeat 3 times
+		key code 36
+		delay 0.5
+	end repeat
+	repeat with channel in channelList
+		set leaveCmd to "/leave " & channel
+		keystroke leaveCmd
+		key code 36
+		delay 0.5
+	end repeat
+end tell
